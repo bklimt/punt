@@ -109,3 +109,40 @@ test("object error", function() {
   });
 });
 
+
+test("repeat", function() {
+  stop();
+
+  var button = {
+    on: function(callback) {
+      this.handlers = this.handlers || [];
+      this.handlers.push(callback);
+    },
+
+    click: function() {
+      var self = this;
+      var args = arguments;
+      setTimeout(function() {
+        var i;
+        for (i = 0; self.handlers && i < self.handlers.length; ++i) {
+          self.handlers[i].apply(self, args);
+        }
+      }, 10);
+    }
+  };
+
+  var wrapped = punt.callback(button.on, button);
+  var deferred = wrapped();
+
+  button.click("hello");
+  button.click("goodbye");
+
+  deferred.then(function(result) {
+    equal(result, "hello");
+    start();
+  }, function(error) {
+    ok(false, "Should have succeeded.");
+    start();
+  });
+});
+

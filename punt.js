@@ -59,6 +59,22 @@ root.punt = function(makePromise) {
         }));
         return deferred;
       };
+    },
+
+    /**
+     *
+     */
+    repeat: function(func, self) {
+      return function() {
+        var deferreds = [makePromise()];
+        func.apply(self || this, toArray(arguments).concat(function() {
+          deferreds.shift().resolve.apply(deferred, arguments);
+        }, function() {
+          deferreds.shift().reject.apply(deferred, arguments);
+        }));
+        return {
+        };
+      };
     }
   };
 };
