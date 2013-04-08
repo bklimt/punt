@@ -1,0 +1,24 @@
+{
+  "name": "punt",
+  "version": "0.1.0",
+  "description": "Utilities to make it easier to use promises in browsers and node.",
+  "main": "punt.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bklimt/punt.git"
+  },
+  "author": "bklimt@gmail.com",
+  "license": "BSD",
+  "readmeFilename": "README.md",
+  "gitHead": "00c813483ad9494f42a25911a4c41d2761c5c67d",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-qunit": "~0.2.1"
+  }
+}
