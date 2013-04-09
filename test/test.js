@@ -110,11 +110,15 @@ test("object error", function() {
 });
 
 
-test("repeat", function() {
+test("generator", function() {
+  expect(6);
   stop();
 
   var button = {
-    on: function(callback) {
+    on: function(event, callback) {
+      if (event !== "click") {
+        throw "The only event this test handles is click.";
+      }
       this.handlers = this.handlers || [];
       this.handlers.push(callback);
     },
@@ -122,23 +126,48 @@ test("repeat", function() {
     click: function() {
       var self = this;
       var args = arguments;
-      setTimeout(function() {
-        var i;
-        for (i = 0; self.handlers && i < self.handlers.length; ++i) {
-          self.handlers[i].apply(self, args);
-        }
-      }, 10);
+      var i;
+      for (i = 0; self.handlers && i < self.handlers.length; ++i) {
+        self.handlers[i].apply(self, args);
+      }
     }
   };
 
-  var wrapped = punt.callback(button.on, button);
-  var deferred = wrapped();
+  var clicks = punt.generator(button.on, button)("click");
 
-  button.click("hello");
-  button.click("goodbye");
+  button.click("a");
+  button.click("b");
+  button.click("c");
 
-  deferred.then(function(result) {
-    equal(result, "hello");
+  clicks().then(function(result) {
+    equal(result, "a");
+    return clicks();
+
+  }).then(function(result) {
+    equal(result, "b");
+    return clicks();
+
+  }).then(function(result) {
+    equal(result, "c");
+    setTimeout(function() {
+      button.click("d");
+      button.click("e");
+      button.click("f");
+    }, 10);
+    return clicks();
+
+  }).then(function(result) {
+    equal(result, "d");
+    return clicks();
+
+  }).then(function(result) {
+    equal(result, "e");
+    return clicks();
+
+  }).then(function(result) {
+    equal(result, "f");
+
+  }).then(function() {
     start();
   }, function(error) {
     ok(false, "Should have succeeded.");
